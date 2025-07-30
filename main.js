@@ -99,8 +99,8 @@ const videoCommand = require('./commands/video');
 // Global settings
 global.packname = settings.packname;
 global.author = settings.author;
-global.channelLink = "https://whatsapp.com/channel/0029Va90zAnIHphOuO8Msp3A";
-global.ytch = "Mr Unique Hacker";
+global.channelLink = "https://whatsapp.com/channel/0029VaXKAEoKmCPS6Jz7sw0N";
+global.ytch = "AiOFLautech";
 
 // Add this near the top of main.js with other global configurations
 const channelInfo = {
@@ -108,8 +108,8 @@ const channelInfo = {
         forwardingScore: 1,
         isForwarded: true,
         forwardedNewsletterMessageInfo: {
-            newsletterJid: '120363161513685998@newsletter',
-            newsletterName: 'KnightBot MD',
+            newsletterJid: '120363269950668068@newsletter',
+            newsletterName: '❦ ════ •⊰❂ AI TOOLS HUB  ❂⊱• ════ ❦',
             serverMessageId: -1
         }
     }
