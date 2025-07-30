@@ -1,14 +1,3 @@
-/**
- * Knight Bot - A WhatsApp Bot
- * Copyright (c) 2024 Professor
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the MIT License.
- * 
- * Credits:
- * - Baileys Library by @adiwajshing
- * - Pair Code implementation inspired by TechGod143 & DGXEON
- */
 require('./settings')
 const { Boom } = require('@hapi/boom')
 const fs = require('fs')
@@ -102,12 +91,12 @@ const question = (text) => {
 }
 
          
-async function startXeonBotInc() {
+async function startGodszealBotInc() {
     let { version, isLatest } = await fetchLatestBaileysVersion()
     const { state, saveCreds } = await useMultiFileAuthState(`./session`)
     const msgRetryCounterCache = new NodeCache()
 
-    const XeonBotInc = makeWASocket({
+    const GodszealBotInc = makeWASocket({
         version,
         logger: pino({ level: 'silent' }),
         printQRInTerminal: !pairingCode,
@@ -127,28 +116,28 @@ async function startXeonBotInc() {
         defaultQueryTimeoutMs: undefined,
     })
 
-    store.bind(XeonBotInc.ev)
+    store.bind(GodszealBotInc.ev)
 
     // Message handling
-    XeonBotInc.ev.on('messages.upsert', async chatUpdate => {
+    GodszealBotInc.ev.on('messages.upsert', async chatUpdate => {
         try {
             const mek = chatUpdate.messages[0]
             if (!mek.message) return
             mek.message = (Object.keys(mek.message)[0] === 'ephemeralMessage') ? mek.message.ephemeralMessage.message : mek.message
             if (mek.key && mek.key.remoteJid === 'status@broadcast') {
-                await handleStatus(XeonBotInc, chatUpdate);
+                await handleStatus(GodszealBotInc, chatUpdate);
                 return;
             }
-            if (!XeonBotInc.public && !mek.key.fromMe && chatUpdate.type === 'notify') return
+            if (!GodszealBotInc.public && !mek.key.fromMe && chatUpdate.type === 'notify') return
             if (mek.key.id.startsWith('BAE5') && mek.key.id.length === 16) return
             
             try {
-                await handleMessages(XeonBotInc, chatUpdate, true)
+                await handleMessages(GodszealBotInc, chatUpdate, true)
             } catch (err) {
                 console.error("Error in handleMessages:", err)
                 // Only try to send error message if we have a valid chatId
                 if (mek.key && mek.key.remoteJid) {
-                    await XeonBotInc.sendMessage(mek.key.remoteJid, { 
+                    await GodszealBotInc.sendMessage(mek.key.remoteJid, { 
                         text: '❌ An error occurred while processing your message.',
                         contextInfo: {
                             forwardingScore: 1,
@@ -168,7 +157,7 @@ async function startXeonBotInc() {
     })
 
     // Add these event handlers for better functionality
-    XeonBotInc.decodeJid = (jid) => {
+    GodszealBotInc.decodeJid = (jid) => {
         if (!jid) return jid
         if (/:\d+@/gi.test(jid)) {
             let decode = jidDecode(jid) || {}
@@ -176,37 +165,37 @@ async function startXeonBotInc() {
         } else return jid
     }
 
-    XeonBotInc.ev.on('contacts.update', update => {
+    GodszealBotInc.ev.on('contacts.update', update => {
         for (let contact of update) {
-            let id = XeonBotInc.decodeJid(contact.id)
+            let id = GodszealBotInc.decodeJid(contact.id)
             if (store && store.contacts) store.contacts[id] = { id, name: contact.notify }
         }
     })
 
-    XeonBotInc.getName = (jid, withoutContact = false) => {
-        id = XeonBotInc.decodeJid(jid)
-        withoutContact = XeonBotInc.withoutContact || withoutContact 
+    GodszealBotInc.getName = (jid, withoutContact = false) => {
+        id = GodszealBotInc.decodeJid(jid)
+        withoutContact = GodszealBotInc.withoutContact || withoutContact 
         let v
         if (id.endsWith("@g.us")) return new Promise(async (resolve) => {
             v = store.contacts[id] || {}
-            if (!(v.name || v.subject)) v = XeonBotInc.groupMetadata(id) || {}
+            if (!(v.name || v.subject)) v = GodszealBotInc.groupMetadata(id) || {}
             resolve(v.name || v.subject || PhoneNumber('+' + id.replace('@s.whatsapp.net', '')).getNumber('international'))
         })
         else v = id === '0@s.whatsapp.net' ? {
             id,
             name: 'WhatsApp'
-        } : id === XeonBotInc.decodeJid(XeonBotInc.user.id) ?
-            XeonBotInc.user :
+        } : id === GodszealBotInc.decodeJid(GodszealBotInc.user.id) ?
+            GodszealBotInc.user :
             (store.contacts[id] || {})
         return (withoutContact ? '' : v.name) || v.subject || v.verifiedName || PhoneNumber('+' + jid.replace('@s.whatsapp.net', '')).getNumber('international')
     }
 
-    XeonBotInc.public = true
+    GodszealBotInc.public = true
 
-    XeonBotInc.serializeM = (m) => smsg(XeonBotInc, m, store)
+    GodszealBotInc.serializeM = (m) => smsg(GodszealBotInc, m, store)
 
     // Handle pairing code
-    if (pairingCode && !XeonBotInc.authState.creds.registered) {
+    if (pairingCode && !GodszealBotInc.authState.creds.registered) {
         if (useMobile) throw new Error('Cannot use pairing code with mobile api')
 
         let phoneNumber
@@ -228,7 +217,7 @@ async function startXeonBotInc() {
 
         setTimeout(async () => {
             try {
-                let code = await XeonBotInc.requestPairingCode(phoneNumber)
+                let code = await GodszealBotInc.requestPairingCode(phoneNumber)
                 code = code?.match(/.{1,4}/g)?.join("-") || code
                 console.log(chalk.black(chalk.bgGreen(`Your Pairing Code : `)), chalk.black(chalk.white(code)))
                 console.log(chalk.yellow(`\nPlease enter this code in your WhatsApp app:\n1. Open WhatsApp\n2. Go to Settings > Linked Devices\n3. Tap "Link a Device"\n4. Enter the code shown above`))
@@ -240,14 +229,14 @@ async function startXeonBotInc() {
     }
 
     // Connection handling
-    XeonBotInc.ev.on('connection.update', async (s) => {
+    GodszealBotInc.ev.on('connection.update', async (s) => {
         const { connection, lastDisconnect } = s
         if (connection == "open") {
             console.log(chalk.magenta(` `))
-            console.log(chalk.yellow(`🌿Connected to => ` + JSON.stringify(XeonBotInc.user, null, 2)))
+            console.log(chalk.yellow(`🌿Connected to => ` + JSON.stringify(GodszealBotInc.user, null, 2)))
             
-            const botNumber = XeonBotInc.user.id.split(':')[0] + '@s.whatsapp.net';
-            await XeonBotInc.sendMessage(botNumber, { 
+            const botNumber = GodszealBotInc.user.id.split(':')[0] + '@s.whatsapp.net';
+            await GodszealBotInc.sendMessage(botNumber, { 
                 text: `🤖 Bot Connected Successfully!\n\n⏰ Time: ${new Date().toLocaleString()}\n✅ Status: Online and Ready!
                 \n✅Make sure to join below channel`,
                 contextInfo: {
@@ -276,36 +265,36 @@ async function startXeonBotInc() {
             lastDisconnect.error &&
             lastDisconnect.error.output.statusCode != 401
         ) {
-            startXeonBotInc()
+            startGodszealBotInc()
         }
     })
 
-    XeonBotInc.ev.on('creds.update', saveCreds)
+    GodszealBotInc.ev.on('creds.update', saveCreds)
     
-    XeonBotInc.ev.on('group-participants.update', async (update) => {
-        await handleGroupParticipantUpdate(XeonBotInc, update);
+    GodszealBotInc.ev.on('group-participants.update', async (update) => {
+        await handleGroupParticipantUpdate(GodszealBotInc, update);
     });
 
-    XeonBotInc.ev.on('messages.upsert', async (m) => {
+    GodszealBotInc.ev.on('messages.upsert', async (m) => {
         if (m.messages[0].key && m.messages[0].key.remoteJid === 'status@broadcast') {
-            await handleStatus(XeonBotInc, m);
+            await handleStatus(GodszealBotInc, m);
         }
     });
 
-    XeonBotInc.ev.on('status.update', async (status) => {
-        await handleStatus(XeonBotInc, status);
+    GodszealBotInc.ev.on('status.update', async (status) => {
+        await handleStatus(GodszealBotInc, status);
     });
 
-    XeonBotInc.ev.on('messages.reaction', async (status) => {
-        await handleStatus(XeonBotInc, status);
+    GodszealBotInc.ev.on('messages.reaction', async (status) => {
+        await handleStatus(GodszealBotInc, status);
     });
 
-    return XeonBotInc
+    return GodszealBotInc
 }
 
 
 // Start the bot with error handling
-startXeonBotInc().catch(error => {
+startGodszealBotInc().catch(error => {
     console.error('Fatal error:', error)
     process.exit(1)
 })
