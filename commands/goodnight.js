@@ -2,17 +2,34 @@ const fetch = require('node-fetch');
 
 async function goodnightCommand(sock, chatId, message) {
     try {
-        const shizokeys = 'knightbot';
-        const res = await fetch(`https://api.shizo.top/api/quote/gnsd?apikey=${shizokeys}`);
+        // New API endpoint (no API key needed)
+        const res = await fetch('https://apis.davidcyriltech.my.id/random/quotes');
         
         if (!res.ok) {
             throw await res.text();
         }
         
         const json = await res.json();
-        const goodnightMessage = json.result;
+        
+        // Verify API success status
+        if (!json.success) {
+            throw new Error('API returned unsuccessful status');
+        }
+        
+        // Extract and format quote with author
+        const quote = json.response?.quote;
+        const author = json.response?.author;
+        
+        if (!quote) {
+            throw new Error('Quote not found in response');
+        }
+        
+        // Format: "quote - author" (maintains existing string format)
+        const goodnightMessage = author 
+            ? `${quote} - ${author}` 
+            : quote;
 
-        // Send the goodnight message
+        // Send the formatted message
         await sock.sendMessage(chatId, { text: goodnightMessage }, { quoted: message });
     } catch (error) {
         console.error('Error in goodnight command:', error);
@@ -20,4 +37,4 @@ async function goodnightCommand(sock, chatId, message) {
     }
 }
 
-module.exports = { goodnightCommand }; 
+module.exports = { goodnightCommand };
