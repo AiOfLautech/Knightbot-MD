@@ -129,7 +129,7 @@ async function stickerTelegramCommand(sock, chatId, msg) {
                     const metadata = {
                         'sticker-pack-id': crypto.randomBytes(32).toString('hex'),
                         'sticker-pack-name': settings.packname,
-                        'emojis': sticker.emoji ? [sticker.emoji] : ['🤖']
+                        'emojis': sticker.emoji ? [sticker.emoji] : ['+']
                     };
 
                     // Create exif buffer
